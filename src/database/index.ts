@@ -12,6 +12,8 @@ const storageKeys = {
   REFRESH_TOKEN: 'REFRESH_TOKEN',
   LIST_NOTIFICATION: 'LIST_NOTIFICATION',
   LIST_MESSAGE_ADDRESS: 'LIST_MESSAGE_ADDRESS',
+  LOG: 'LOG',
+  DESTROY: 'DESTROY',
 };
 
 function getItem<T>(key: string): T | null {

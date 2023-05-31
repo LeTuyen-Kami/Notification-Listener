@@ -20,10 +20,10 @@ const Container: React.FC<any> = props => {
   );
   const [apiSMSUrl, setApiSMSUrl] = useAtom(apiSMSUrlAtom);
   const [userAgent, setUserAgent] = useAtom(userAgentAtom);
+  const [listCheckedApp, setListCheckedApp] = useAtom(listCheckAppAtom);
   const [search, setSearch] = React.useState('');
   const [listApp, setListApp] = React.useState<any[]>([]);
   const [listAppFilter, setListAppFilter] = React.useState<any[]>([]);
-  const [listCheckedApp, setListCheckedApp] = useAtom(listCheckAppAtom);
   const [listMessageAddress, setListMessageAddress] = useAtom(
     listMessageAddressAtom,
   );

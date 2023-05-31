@@ -49,4 +49,19 @@ class RNNotificationListener: NotificationListenerService() {
         context.startService(intent)
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        return START_STICKY
+    }
+
+    override fun onDestroy() {
+        Log.d("RNNotificationListener", "onDestroy")
+        val context = applicationContext
+        val intent = Intent(context, RNNotificationListenerHeadlessTask::class.java)
+        val gson = Gson()
+        intent.putExtra("destroy", gson.toJson("destroy"))
+        HeadlessJsTaskService.acquireWakeLockNow(context)
+        context.startService(intent)
+        super.onDestroy()
+    }
+
 }

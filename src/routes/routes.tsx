@@ -4,6 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
   HomeView,
+  ListLog,
   ListNotification,
   ListSMS,
   LoginView,
@@ -48,6 +49,13 @@ const AppNavigation = () => {
             title: 'Danh sách tin nhắn',
           }}
           component={ListSMS}
+        />
+        <Stack.Screen
+          name="ListLog"
+          options={{
+            title: 'Danh sách log',
+          }}
+          component={ListLog}
         />
       </Stack.Navigator>
     </NavigationContainer>

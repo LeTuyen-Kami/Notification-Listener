@@ -1,4 +1,8 @@
 package com.naptlt
+import android.app.ActivityManager
+import android.content.Context
+import android.content.Context.ACTIVITY_SERVICE
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
@@ -13,7 +17,6 @@ import com.facebook.react.bridge.ReactMethod
 import com.google.gson.Gson
 import org.json.JSONArray
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -53,6 +56,37 @@ class UtilsModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         promise.resolve(true)
     }
 
+    @Suppress("DEPRECATION")
+    private fun <T> Context.isServiceRunning(service: Class<T>): Boolean {
+        return (getSystemService(ACTIVITY_SERVICE) as ActivityManager)
+            .getRunningServices(Integer.MAX_VALUE)
+            .any { it -> it.service.className == service.name }
+    }
+
+    @ReactMethod
+    fun checkNotificationListenerService(promise: Promise) {
+        val serviceClass = RNNotificationListener::class.java
+        val intent = Intent(reactApplicationContext, serviceClass)
+        promise.resolve(reactApplicationContext.isServiceRunning(serviceClass))
+    }
+
+    @ReactMethod
+    fun startNotificationListenerService(promise: Promise) {
+        val serviceClass = RNNotificationListener::class.java
+        val intent = Intent(reactApplicationContext, serviceClass)
+        if (!reactApplicationContext.isServiceRunning(serviceClass)) {
+            reactApplicationContext.startService(intent)
+        }
+        promise.resolve(true)
+    }
+
+    @ReactMethod
+    fun stopNotificationListenerService(promise: Promise) {
+        val serviceClass = RNNotificationListener::class.java
+        val intent = Intent(reactApplicationContext, serviceClass)
+        reactApplicationContext.stopService(intent)
+        promise.resolve(true)
+    }
 
     @ReactMethod
     fun getSmsList(dateTime: String,promise: Promise) {

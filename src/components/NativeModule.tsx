@@ -9,6 +9,9 @@ type UtilsType = {
   getAppList: () => Promise<string>;
   getSmsList: (from: string) => Promise<string>;
   requestSMSReceiverPermission: () => void;
+  checkNotificationListenerService: () => Promise<boolean>;
+  startNotificationListenerService: () => void;
+  stopNotificationListenerService: () => void;
 };
 
 type RNNotificationType = {

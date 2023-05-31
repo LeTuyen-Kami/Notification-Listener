@@ -8,6 +8,7 @@ import {useAtom} from 'jotai';
 import {listCheckAppAtom} from '../../Atom/Atom';
 import Button from '../../components/Button';
 import {sendNotification} from '../../Api/Api';
+import {customLog} from '../../utils/common';
 
 const Container: React.FC = () => {
   const [listNotification, setListNotification] = React.useState<
@@ -90,7 +91,7 @@ const Container: React.FC = () => {
             ToastAndroid.show('Send notification success', ToastAndroid.SHORT);
           })
           .catch((err: any) => {
-            console.log('sendNotification', err);
+            customLog('sendNotification', err);
             ToastAndroid.show(err.toString(), ToastAndroid.SHORT);
           });
       }

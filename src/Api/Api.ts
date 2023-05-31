@@ -1,5 +1,6 @@
 import axios from 'axios';
 import storage, {storageKeys} from '../database';
+import {customLog} from '../utils/common';
 
 const BASE_URL = 'https://truyenyy.vip/api/';
 
@@ -12,7 +13,7 @@ axios.interceptors.request.use(config => {
   const userAgent = JSON.parse(
     JSON.parse(storage.getString(storageKeys.USER_AGENT) || ''),
   );
-  console.log('userAgent', userAgent);
+  customLog('userAgent', userAgent);
   headers['User-Agent'] = userAgent;
   return config;
 });
@@ -56,7 +57,7 @@ export const sendNotification: (
   token: string,
   data: any,
 ) => any = (url, token, data) => {
-  console.log('sendNotification', url, token, data);
+  customLog('sendNotification', url, token, data);
   return axios
     .post(url, data, {
       headers: {
@@ -74,7 +75,7 @@ export const sendNotification: (
 };
 
 export const sendSms = (url: string, token: string, data: any) => {
-  console.log('sendSms', url, token, data);
+  customLog('sendSms', url, token, data);
   return axios
     .post(url, data, {
       headers: {

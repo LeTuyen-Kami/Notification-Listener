@@ -7,6 +7,12 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {getAccessToken} from '../../Api/Api';
 import storage, {storageKeys} from '../../database';
+import {useAtom} from 'jotai/index';
+import {
+  apiNotificationUrlAtom,
+  apiSMSUrlAtom,
+  userAgentAtom,
+} from '../../Atom/Atom';
 
 const Container: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -15,13 +21,16 @@ const Container: React.FC = () => {
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [loadingSubmit, setLoadingSubmit] = React.useState(false);
-
+  const [apiSMSUrl, setApiSMSUrl] = useAtom(apiSMSUrlAtom);
+  const [userAgent, setUserAgent] = useAtom(userAgentAtom);
+  const [apiNotificationUrl, setApiNotificationUrl] = useAtom(
+    apiNotificationUrlAtom,
+  );
   const canSubmit = React.useMemo(() => {
     return username.trim().length > 0 && password.trim().length > 0;
   }, [username, password]);
 
   const onPressSubmit = () => {
-    console.log('onPressSubmit', username, password);
     if (loadingSubmit) {
       return;
     }
@@ -52,6 +61,29 @@ const Container: React.FC = () => {
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
+
+  React.useEffect(() => {
+    if (!apiNotificationUrl?.trim()) {
+      setApiNotificationUrl(
+        'https://truyenyy.vip/valhalla/api/internet-banking/submit-notification/',
+      );
+    }
+    if (!apiSMSUrl?.trim()) {
+      setApiSMSUrl(
+        'https://truyenyy.vip/valhalla/api/internet-banking/submit-message/',
+      );
+    }
+    if (!userAgent?.trim()) {
+      setUserAgent('TLT/2023');
+    }
+  }, [
+    apiNotificationUrl,
+    apiSMSUrl,
+    setApiNotificationUrl,
+    setApiSMSUrl,
+    setUserAgent,
+    userAgent,
+  ]);
 
   return (
     <View className={'flex-1 p-2'}>

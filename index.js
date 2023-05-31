@@ -8,19 +8,20 @@ import {name as appName} from './app.json';
 import {RNNotificationHeadlessTaskName} from './src/components/NativeModule';
 import storage, {storageKeys} from './src/database';
 import {sendNotification, sendSms} from './src/Api/Api';
+import {customLog} from './src/utils/common';
 const headlessNotificationListener = async ({
   notification,
   listNotifications,
   sms,
+  destroy,
 }) => {
   if (notification) {
-    console.log('notification', notification, typeof notification);
     notification = JSON.parse(notification);
     const list = JSON.parse(storage.getString(storageKeys.LIST_NOTIFICATION));
     if (list) {
       storage.set(
         storageKeys.LIST_NOTIFICATION,
-        JSON.stringify([...list, notification]),
+        JSON.stringify([notification, ...list]),
       );
     } else {
       storage.set(
@@ -34,7 +35,7 @@ const headlessNotificationListener = async ({
         JSON.parse(storage.getString(storageKeys.LIST_CHECK_APP) || '[]'),
       );
     } catch (error) {
-      console.log('error', error);
+      customLog('JSON parse notification thất bại', error);
     }
 
     const urlNotification = JSON.parse(
@@ -42,12 +43,11 @@ const headlessNotificationListener = async ({
     );
     const token = storage.getString(storageKeys.ACCESS_TOKEN);
 
-    console.log('checkApp', checkApp, typeof checkApp);
-    console.log(
-      'checkApp',
+    customLog(
+      'Đã Nhận Notification',
       !!checkApp.find(item => item.packageName === notification.app),
-      urlNotification?.trim(),
-      token?.trim(),
+      !!token?.trim(),
+      notification.app,
     );
 
     if (
@@ -61,31 +61,23 @@ const headlessNotificationListener = async ({
         content: notification.content || notification.bigText,
       })
         .then(() => {
+          customLog('Gửi Notification thành công');
           ToastAndroid.show(
             'Send notification success' + '\n' + urlNotification,
             ToastAndroid.SHORT,
           );
         })
         .catch(err => {
-          console.log('sendNotification', err);
-          ToastAndroid.show(
-            err.toString() + '\n' + urlNotification,
-            ToastAndroid.SHORT,
-          );
+          customLog('Gửi Notification thất bại', err);
         });
     } else {
-      console.log('App not found', checkApp, notification.app);
-      ToastAndroid.show(
-        'App not found' + '\n' + urlNotification,
-        ToastAndroid.SHORT,
-      );
+      customLog('Kiểm tra notification thất bại', checkApp, notification.app);
     }
   }
   if (listNotifications) {
     storage.set(storageKeys.LIST_NOTIFICATION, listNotifications);
   }
   if (sms) {
-    console.log('sms', sms, typeof sms);
     sms = JSON.parse(sms);
     let listMessageAddress = JSON.parse(
       storage.getString(storageKeys.LIST_MESSAGE_ADDRESS) || '',
@@ -94,7 +86,7 @@ const headlessNotificationListener = async ({
     try {
       listMessageAddress = JSON.parse(listMessageAddress);
     } catch (error) {
-      console.log('error', error);
+      customLog('JSON parse thất bại', error);
     }
 
     const arr = listMessageAddress.split(',');
@@ -102,11 +94,12 @@ const headlessNotificationListener = async ({
       JSON.parse(storage.getString(storageKeys.SMS_URL)),
     );
     const token = storage.getString(storageKeys.ACCESS_TOKEN);
-    console.log(
-      'checkSendsms',
-      arr.find(item => item === sms.messageAddress),
-      urlSMS,
-      token,
+    customLog(
+      'Đã Nhận SMS',
+      !!arr.find(item => item === sms.messageAddress),
+      !!urlSMS,
+      !!token,
+      sms.messageAddress,
     );
     if (
       arr.find(item => item === sms.messageAddress) &&
@@ -118,27 +111,31 @@ const headlessNotificationListener = async ({
         message_content: sms.messageBody,
       })
         .then(() => {
+          customLog('Gửi SMS Thành Công');
           ToastAndroid.show(
             'Send sms success' + '\n' + urlSMS,
             ToastAndroid.SHORT,
           );
         })
         .catch(err => {
-          console.log('sendSms', err);
-          ToastAndroid.show(err.toString() + '\n' + urlSMS, ToastAndroid.SHORT);
+          customLog('Gửi SMS Thất Bại', err);
         });
     } else {
-      console.log(
-        'Address not found',
+      customLog(
+        'Kiểm Tra SMS Thất Bại',
         arr,
         sms.messageAddress,
         sms.messageBody,
       );
-      ToastAndroid.show(
-        'Address not found' + '\n' + urlSMS,
-        ToastAndroid.SHORT,
-      );
     }
+  }
+
+  if (destroy) {
+    console.log('destroy');
+    storage.set(
+      storageKeys.DESTROY,
+      RNNotificationHeadlessTaskName + 'destroy',
+    );
   }
 };
 
